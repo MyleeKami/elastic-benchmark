@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
+import org.jggn.testelastic.configuration.ProcessException;
 import org.jggn.testelastic.models.EnumType;
 import org.jggn.testelastic.models.Pony;
 import org.jggn.testelastic.service.PonyService;
@@ -24,7 +25,7 @@ public class PonyController {
 
 	@GetMapping(value = "/generate")
 	public List<Pony> getGeneratedPonies(@RequestParam(required = false, defaultValue = "10") Integer nb,
-			@RequestParam(required = false, defaultValue = "false") boolean insert) throws IOException {
+			@RequestParam(required = false, defaultValue = "false") boolean insert) throws IOException, ProcessException {
 		List<Pony> ponies = service.generatePonies(nb);
 		if (insert) {
 			service.saveAll(ponies);

@@ -12,6 +12,7 @@ import org.elasticsearch.client.indices.GetMappingsRequest;
 import org.elasticsearch.client.indices.GetMappingsResponse;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.jggn.testelastic.configuration.ProcessException;
 import org.jggn.testelastic.models.EnumType;
 import org.jggn.testelastic.models.Pony;
 import org.jggn.testelastic.utils.ElasticMapper;
@@ -56,10 +57,10 @@ public class PonyRepository{
 		return mapDta;
 	}
 
-	public void saveAll(List<Pony> ponies) throws IOException {
-	
+	public void saveAll(List<Pony> ponies) throws IOException, ProcessException {
+		MappingMetaData ponyMapping = getMapping();
 		for (Pony pony : ponies) {
-			Map<String,Object> obj=mapper.mapObject(pony.generateMap(),getMapping());
+			Map<String,Object> obj=mapper.mapObject(pony.generateMap(),ponyMapping);
 			String id = pony.getPonyId().toString();
 			IndexRequest request = new IndexRequest(index);
 			request.id(id);		

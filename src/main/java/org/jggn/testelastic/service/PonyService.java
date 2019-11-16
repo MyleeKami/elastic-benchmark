@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.jggn.testelastic.configuration.ProcessException;
 import org.jggn.testelastic.models.EnumType;
 import org.jggn.testelastic.models.Pony;
 import org.jggn.testelastic.repository.PonyRepository;
@@ -30,7 +31,7 @@ public class PonyService {
 		return ponyGenerator.generatePonies(nb);
 	}
 
-	public void saveAll(List<Pony> ponies) throws IOException {
+	public void saveAll(List<Pony> ponies) throws IOException, ProcessException {
 		ponyRepository.saveAll(ponies);
 	}
 
