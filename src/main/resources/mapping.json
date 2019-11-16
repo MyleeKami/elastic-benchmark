@@ -1,0 +1,46 @@
+curl -X PUT "192.168.18.132:9200/ponies/_mapping" -H 'Content-Type: application/json' -d'
+{
+	"mappings": {
+		"ponies": {
+			"dynamic": "false",
+			"properties": {
+				"ponyId": {
+					"type": "text"
+				},
+				"name": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"birthPlace": {
+					"type": "text"
+				},
+				"genre": {
+					"type": "text"
+				},
+				"dateOfBirth": {
+					"type": "date"
+				},
+				"weigh": {
+					"type": "integer"
+				},
+				"networkLocation": {
+					"type": "ip"
+				},
+				"type": {
+					"type": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				}
+			}
+		}
+	}
+}
+'
