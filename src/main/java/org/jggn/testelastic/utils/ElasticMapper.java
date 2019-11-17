@@ -1,14 +1,9 @@
 package org.jggn.testelastic.utils;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.lucene.analysis.CharArrayMap.EntrySet;
-import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.jggn.testelastic.configuration.ProcessException;
 import org.springframework.beans.factory.annotation.Autowired;
