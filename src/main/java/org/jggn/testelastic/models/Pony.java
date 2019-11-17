@@ -1,10 +1,13 @@
 package org.jggn.testelastic.models;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import org.elasticsearch.search.SearchHit;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +37,25 @@ public class Pony {
 		val.put("type", type.toString());
 		return val;
 		
+	}
+	
+	
+	public Pony(SearchHit hit)
+	{
+		Map<String,Object> val=hit.getSourceAsMap();
+		ponyId=UUID.fromString(val.get("ponyId").toString());
+		name=val.get("name").toString();
+		birthPlace=(String) val.get("birthPlace").toString();
+		genre=EnumGenre.valueOf(val.get("genre").toString());
+		dateOfBirth=Instant.parse(val.get("dateOfBirth").toString());
+		weigh=Integer.parseInt(val.get("weigh").toString());
+		try {
+			networkLocation=InetAddress.getByName(val.get("networkLocation").toString());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		type=EnumType.valueOf(val.get("type").toString());
 	}
 
 }

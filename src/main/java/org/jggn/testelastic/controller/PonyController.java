@@ -39,9 +39,10 @@ public class PonyController {
 	 * @param pageable
 	 * @param type
 	 * @return
+	 * @throws IOException 
 	 */
 	@GetMapping("/serialized")
-	public Slice<Pony> getPoniesSerialized(Pageable pageable, @RequestParam(required = true) EnumType type) {
+	public Slice<Pony> getPoniesSerialized(Pageable pageable, @RequestParam(required = true) EnumType type) throws IOException {
 		Instant i1 = Instant.now();
 		Slice<Pony> ponies= service.getAllByType(pageable, type);
 		Instant i2 = Instant.now();

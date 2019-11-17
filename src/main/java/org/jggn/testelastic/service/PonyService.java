@@ -36,22 +36,9 @@ public class PonyService {
 	}
 
 
-	public Slice<Pony> getAllByType(Pageable p, EnumType type) {
-		Instant i1 = Instant.now();
-		CompletableFuture<Long> future = ponyRepository.countByType(type);
-		Instant i1p = Instant.now();
-		Long l = null;
-		try {
-			l = future.get(100, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-		} catch (ExecutionException e) {
-		} catch (TimeoutException e) {
-		}
-		Instant i2 = Instant.now();
-		Slice<Pony> poniesPage = ponyRepository.findAllByType(p, type);
-		if (l != null) {
-			return new PageImpl<>(poniesPage.getContent(), poniesPage.getPageable(), l);
-		}
+	public Slice<Pony> getAllByType(Pageable p, EnumType type) throws IOException {
+		
+		Slice<Pony> poniesPage = ponyRepository.findAllByType(p, type);		
 		return poniesPage;
 	}
 
