@@ -73,7 +73,7 @@ public class PonyRepository{
 		int localFetchSize=(int) (fetchSize>offset?offset+p.getPageSize():fetchSize);
 		int pageNumber=(int) (offset/fetchSize);
 		//Requete
-		QueryBuilder query = QueryBuilders.matchQuery("type", type.name());
+		QueryBuilder query = QueryBuilders.termQuery("type.keyword", type.name());
 		builder.query(query);
 		builder.size(localFetchSize);
 		SearchResponse response = client.search(new SearchRequest("ponies").source(builder).scroll(scroll),RequestOptions.DEFAULT);
