@@ -7,7 +7,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -36,6 +38,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpClientErrorException.TooManyRequests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -95,6 +98,8 @@ public class PonyRepository{
 
 	public void saveAll(List<Pony> ponies) throws IOException, ProcessException {
 		MappingMetaData ponyMapping = mappings.get("ponies");
+		BulkRequest batchRunBP = new BulkRequest();
+		boolean backPressureHandling = false;
 		BulkRequest batchRun = new BulkRequest();
 		for (Pony pony : ponies) {
 			Map<String,Object> obj=mapper.mapObject(pony.generateMap(),ponyMapping);
@@ -104,7 +109,36 @@ public class PonyRepository{
 			request.source(objectMapper.writeValueAsString(obj),XContentType.JSON);
 			batchRun.add(request);
 		}
-		client.bulk(batchRun,RequestOptions.DEFAULT.toBuilder().build());
+		try
+		{
+			BulkResponse response = client.bulk(batchRun,RequestOptions.DEFAULT.toBuilder().build());
+			
+			for (BulkItemResponse bulkItemResponse : response.getItems()) {
+				if(bulkItemResponse.status().ordinal() == 429)
+				{
+					//Gestion du backPressure : sleep + rejeu
+					backPressureHandling =true;
+					//on recupere l'objet
+					batchRunBP.add(batchRun.requests().get(bulkItemResponse.getItemId()));
+				}
+			}
+		}catch(TooManyRequests exc)
+		{
+			backPressureHandling=true;
+			batchRunBP.add(batchRun.requests());
+		}
 		
+		if(backPressureHandling)
+		{
+			
+			try {
+				//On marque une courte temporisation pour laisser le cluster respirer (10ms par requete présentes dans le bulk)
+				Thread.sleep(10*batchRunBP.numberOfActions());
+				BulkResponse response = client.bulk(batchRunBP,RequestOptions.DEFAULT.toBuilder().build());
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			
+		}
 	}
 }
